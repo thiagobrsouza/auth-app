@@ -1,0 +1,62 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Permission {
+  id                 Int                 @id @default(autoincrement())
+  description        String              @unique
+  profilePermissions ProfilePermission[]
+
+  @@map("permissions")
+}
+
+model Profile {
+  id                 Int                 @id @default(autoincrement())
+  description        String              @unique
+  profilePermissions ProfilePermission[]
+  users              User[]
+
+  @@map("profiles")
+}
+
+model ProfilePermission {
+  permissions  Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  profiles     Profile    @relation(fields: [profileId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  permissionId Int
+  profileId    Int
+
+  @@id([permissionId, profileId])
+  @@map("profile-permissions")
+}
+
+model User {
+  id        Int     @id @default(autoincrement())
+  name      String
+  user      String  @unique
+  password  String
+  profile   Profile @relation(fields: [profileId], references: [id])
+  profileId Int
+  cars       Car[]
+
+  @@map("users")
+}
+
+model Car {
+  id      Int    @id @default(autoincrement())
+  model   String
+  plate   String @unique
+  renavam String @unique
+  price   String
+  user   User @relation(fields: [userId], references: [id])
+  userId Int
+
+  @@map("cars")
+}
