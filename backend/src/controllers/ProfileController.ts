@@ -19,11 +19,27 @@ profileRoute.get('/profiles',
   }
 )
 
+profileRoute.get('/profiles/:profileId',
+  async (req: Request, res: Response) => {
+    const { profileId } = req.params
+    const result = await service.findProfileById(+profileId)
+    return res.json(result)
+  }
+)
+
 profileRoute.patch('/profiles/:profileId',
   async (req: Request, res: Response) => {
     const { profileId } = req.params
     const { description, addPermission, removePermission } = req.body
     const result = await service.updateProfile(+profileId, { description, addPermission, removePermission })
     return res.json(result)
+  }
+)
+
+profileRoute.delete('/profiles/:profileId',
+  async (req: Request, res: Response) => {
+    const { profileId } = req.params
+    const result = await service.deleteProfile(+profileId)
+    return res.json()
   }
 )

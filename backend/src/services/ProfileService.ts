@@ -51,15 +51,25 @@ export class ProfileService {
     })
   }
 
+  async findProfileById(profileId: number) {
+    const profile = await prisma.profile.findFirst({
+      where: { id: profileId },
+      select: {
+        id: true, description: true, profilePermissions: { select: { permissions: true } }
+      }
+    })
+    return profile
+  }
+
   async updateProfile(profileId: number, { description, addPermission, removePermission }: UpdateProfile) {
 
     const profileFounded = await prisma.profile.findFirst({
       where: { id: profileId }
-    });
+    })
 
     const exists = await prisma.profile.findFirst({
       where: { description }
-    });
+    })
 
     if (exists && exists.id !== profileFounded?.id) {
       throw new Error('Profile already exists');
@@ -84,8 +94,18 @@ export class ProfileService {
       select: {
         id: true, description: true, profilePermissions: { select: { permissions: true } }
       }
-    });
+    })
 
+  }
+
+  async deleteProfile(profileId: number) {
+    try {
+      return await prisma.profile.delete({
+        where: { id: profileId }
+      })  
+    } catch {
+      throw new Error('Profile is associated with an user')
+    }
   }
 
 }
