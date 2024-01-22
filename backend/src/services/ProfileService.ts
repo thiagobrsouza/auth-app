@@ -9,6 +9,14 @@ export class ProfileService {
 
   async createProfile({ description, permissions }: CreateProfile) {
 
+    const exists = await prisma.profile.findFirst({
+      where: { description }
+    });
+
+    if (exists) {
+      throw new Error('Profile already exists')
+    }
+
     const profile = await prisma.profile.create({
       data: {
         description,
